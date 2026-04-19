@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#0f0f0f" />
+    <meta name="description" content="Forum privé sécurisé" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Forum Privé</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Preload critical fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+  <body>
+    <!-- NO-JS WALL -->
+    <noscript>
+      <div style="
+        position: fixed; inset: 0;
+        background: #080808;
+        display: grid; place-items: center;
+        font-family: monospace;
+        color: #f0f0f0;
+        text-align: center;
+        padding: 40px;
+        z-index: 9999;
+      ">
+        <div>
+          <div style="font-size: 48px; margin-bottom: 24px;">🔒</div>
+          <h1 style="font-size: 24px; margin-bottom: 16px; color: #8b5cf6;">JavaScript requis</h1>
+          <p style="color: #b0b0b0; max-width: 400px;">
+            Ce forum privé nécessite JavaScript pour fonctionner.<br />
+            Veuillez l'activer dans votre navigateur pour continuer.
+          </p>
+        </div>
+      </div>
+    </noscript>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

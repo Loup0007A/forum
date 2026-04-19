@@ -1,0 +1,47 @@
+{
+  "name": "forum-backend",
+  "version": "1.0.0",
+  "description": "Backend du forum privé sécurisé",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only --files src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "db:push": "prisma db push",
+    "db:seed": "ts-node --files prisma/seed.ts",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.13.0",
+    "argon2": "^0.40.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.2.0",
+    "geoip-lite": "^1.4.10",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13",
+    "socket.io": "^4.7.5",
+    "ua-parser-js": "^1.0.38",
+    "uuid": "^9.0.1",
+    "validator": "^13.12.0",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.7",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/geoip-lite": "^1.4.4",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/node": "^20.12.0",
+    "@types/nodemailer": "^6.4.14",
+    "@types/ua-parser-js": "^0.7.39",
+    "@types/uuid": "^9.0.8",
+    "@types/validator": "^13.11.9",
+    "prisma": "^5.13.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.4.5"
+  }
+}
