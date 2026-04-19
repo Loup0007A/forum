@@ -25,33 +25,38 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
   try {
     const ip = getClientIp(req);
     const fingerprint = generateFingerprint(req);
+
     req.clientIp = ip;
     req.fingerprint = fingerprint;
 
-    // Check if IP or fingerprint is banned
     const ban = await prisma.ban.findFirst({
       where: {
-        OR: [
-          { type: 'IP', value: ip },
-          { type: 'FINGERPRINT', value: fingerprint },
-        ],
-        OR: [
-          { permanent: true },
-          { expiresAt: { gt: new Date() } },
-        ],
-      },
+        AND: [
+          {
+            OR: [
+              { type: 'IP', value: ip },
+              { type: 'FINGERPRINT', value: fingerprint }
+            ]
+          },
+          {
+            OR: [
+              { permanent: true },
+              { expiresAt: { gt: new Date() } }
+            ]
+          }
+        ]
+      }
     });
 
     if (ban) {
-      logger.warn(`Tentative d'accès depuis IP/fingerprint bannie: ${ip}`);
-      res.status(403).json({ error: 'Accès refusé. Votre accès a été révoqué.' });
+      logger.warn(`Tentative d'accès bannie: ${ip}`);
+      res.status(403).json({ error: 'Accès refusé.' });
       return;
     }
 
-    // Extract token
     const authHeader = req.headers.authorization;
-    const token = authHeader?.startsWith('Bearer ') 
-      ? authHeader.slice(7) 
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.slice(7)
       : req.cookies?.token;
 
     if (!token) {
@@ -59,31 +64,28 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
       return;
     }
 
-    // Verify JWT
     const payload = verifyToken(token);
     if (!payload) {
       res.status(401).json({ error: 'Token invalide ou expiré.' });
       return;
     }
 
-    // Verify session exists in DB
     const session = await prisma.session.findFirst({
       where: {
         id: payload.sessionId,
         userId: payload.userId,
-        expiresAt: { gt: new Date() },
-      },
+        expiresAt: { gt: new Date() }
+      }
     });
 
     if (!session) {
-      res.status(401).json({ error: 'Session expirée. Veuillez vous reconnecter.' });
+      res.status(401).json({ error: 'Session expirée.' });
       return;
     }
 
-    // Get user
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      select: { id: true, username: true, email: true, role: true, status: true },
+      select: { id: true, username: true, email: true, role: true, status: true }
     });
 
     if (!user) {
@@ -92,34 +94,33 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     }
 
     if (user.status === 'BANNED') {
-      res.status(403).json({ error: 'Votre compte a été banni.' });
+      res.status(403).json({ error: 'Compte banni.' });
       return;
     }
 
     if (user.status === 'PENDING') {
-      res.status(403).json({ error: 'Votre compte est en attente de validation par l\'administrateur.' });
+      res.status(403).json({ error: 'Compte en attente.' });
       return;
     }
 
     req.user = user;
     req.sessionId = payload.sessionId;
 
-    // Update last seen
-    prisma.user.update({
+    void prisma.user.update({
       where: { id: user.id },
-      data: { lastSeenAt: new Date() },
+      data: { lastSeenAt: new Date() }
     }).catch(() => {});
 
     next();
   } catch (error) {
-    logger.error('Auth middleware error:', error);
-    res.status(500).json({ error: 'Erreur d\'authentification.' });
+    logger.error('Auth error:', error);
+    res.status(500).json({ error: 'Erreur serveur.' });
   }
 }
 
 export function requireMod(req: Request, res: Response, next: NextFunction): void {
-  if (!req.user || (req.user.role !== 'MODERATOR' && req.user.role !== 'ADMIN')) {
-    res.status(403).json({ error: 'Permissions insuffisantes. Modérateur requis.' });
+  if (!req.user || !['MODERATOR', 'ADMIN'].includes(req.user.role)) {
+    res.status(403).json({ error: 'Modérateur requis.' });
     return;
   }
   next();
@@ -127,7 +128,7 @@ export function requireMod(req: Request, res: Response, next: NextFunction): voi
 
 export function requireAdmin(req: Request, res: Response, next: NextFunction): void {
   if (!req.user || req.user.role !== 'ADMIN') {
-    res.status(403).json({ error: 'Permissions insuffisantes. Administrateur requis.' });
+    res.status(403).json({ error: 'Admin requis.' });
     return;
   }
   next();
