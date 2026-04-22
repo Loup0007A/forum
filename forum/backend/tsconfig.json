@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "NodeNext", // On change node par NodeNext
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "./dist",
     "rootDir": "./src",
@@ -15,7 +15,6 @@
     "declaration": false,
     "sourceMap": true,
     "types": ["node"]
-    // Supprime la ligne "ignoreDeprecations" qui a causé l'erreur
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
