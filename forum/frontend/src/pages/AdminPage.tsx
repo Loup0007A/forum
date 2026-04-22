@@ -399,11 +399,85 @@ function Logs() {
   );
 }
 
+function ForumManager() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [newCat, setNewCat] = useState({ name: '', slug: '', description: '', icon: '' });
+  const [newForum, setNewForum] = useState({ name: '', slug: '', description: '', categoryId: '' });
+
+  const loadData = () => api.get('/forum/categories').then(r => setCategories(r.data));
+  useEffect(() => { loadData(); }, []);
+
+  const handleCreateCategory = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('/forum/categories', newCat);
+      toast.success('Catégorie créée !');
+      setNewCat({ name: '', slug: '', description: '', icon: '' });
+      loadData();
+    } catch (err) { toast.error('Erreur lors de la création'); }
+  };
+
+  const handleCreateForum = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await api.post('/forum/forums', newForum);
+      toast.success('Forum ajouté !');
+      setNewForum({ name: '', slug: '', description: '', categoryId: '' });
+      loadData();
+    } catch (err) { toast.error('Erreur lors de la création'); }
+  };
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+      {/* Formulaire Catégorie */}
+      <div style={card}>
+        <h3 style={{ color: 'var(--text-0)', marginBottom: 15 }}>📁 Nouvelle Catégorie</h3>
+        <form onSubmit={handleCreateCategory} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: 10 }}>
+          <input className="input" placeholder="Nom (ex: Gaming)" value={newCat.name} onChange={e => setNewCat({...newCat, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-')})} />
+          <input className="input" placeholder="Slug (ex: gaming)" value={newCat.slug} onChange={e => setNewCat({...newCat, slug: e.target.value})} />
+          <button className="btn btn-primary" type="submit">Créer</button>
+        </form>
+      </div>
+
+      {/* Formulaire Forum */}
+      <div style={card}>
+        <h3 style={{ color: 'var(--text-0)', marginBottom: 15 }}>💬 Nouveau Forum</h3>
+        <form onSubmit={handleCreateForum} style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+            <input className="input" placeholder="Nom du forum" value={newForum.name} onChange={e => setNewForum({...newForum, name: e.target.value, slug: e.target.value.toLowerCase().replace(/ /g, '-')})} />
+            <select className="input" value={newForum.categoryId} onChange={e => setNewForum({...newForum, categoryId: e.target.value})}>
+              <option value="">Choisir une catégorie...</option>
+              {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 10 }}>
+            <input className="input" placeholder="Slug du forum" value={newForum.slug} onChange={e => setNewForum({...newForum, slug: e.target.value})} />
+            <button className="btn btn-primary" type="submit">Ajouter au forum</button>
+          </div>
+        </form>
+      </div>
+
+      {/* Liste actuelle */}
+      <div style={card}>
+        <h3 style={{ color: 'var(--text-0)', marginBottom: 15 }}>Structure actuelle</h3>
+        {categories.map(cat => (
+          <div key={cat.id} style={{ marginBottom: 15, padding: 10, border: '1px solid var(--border)', borderRadius: 8 }}>
+            <strong style={{ color: 'var(--accent-h)' }}>{cat.name}</strong>
+            <div style={{ marginLeft: 20, marginTop: 5, fontSize: 12 }}>
+              {cat.forums?.map((f: any) => <div key={f.id}>• {f.name} <span style={{ color: 'var(--text-3)' }}>({f.slug})</span></div>)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 // ─── MAIN ADMIN PAGE ───────────────────────────────────────────────────
 
 const TABS = [
   { path: '/admin', label: '📊 Dashboard', exact: true },
   { path: '/admin/users', label: '👥 Utilisateurs' },
+  { path: '/admin/forum', label: '📁 Catégories & Forums' },
   { path: '/admin/reports', label: '🚩 Signalements' },
   { path: '/admin/bans', label: '🚫 Bannissements' },
   { path: '/admin/logs', label: '📋 Logs admin' },
@@ -451,6 +525,7 @@ export default function AdminPage() {
       <Routes>
         <Route index element={<Dashboard />} />
         <Route path="users" element={<Users />} />
+        <Route path="forum" element={<ForumManager />} />
         <Route path="reports" element={<Reports />} />
         <Route path="bans" element={<Bans />} />
         <Route path="logs" element={<Logs />} />
