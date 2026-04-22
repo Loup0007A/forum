@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only --files src/index.ts",
-    "build": "tsc -p ./tsconfig.json",
+    "build": "cd backend && tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "db:push": "prisma db push",
     "db:seed": "ts-node --files prisma/seed.ts",
