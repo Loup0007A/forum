@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: '/api',
+  // On utilise la variable d'environnement définie sur Render, sinon fallback sur localhost
+  baseURL: (import.meta.env.VITE_API_URL || '') + '/api',
   withCredentials: true,
   timeout: 15000,
 });
