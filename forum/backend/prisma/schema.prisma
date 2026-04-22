@@ -1,0 +1,422 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  MODERATOR
+  ADMIN
+}
+
+enum BanType {
+  IP
+  USER
+  FINGERPRINT
+}
+
+enum LogAction {
+  LOGIN
+  LOGOUT
+  REGISTER
+  LOGIN_FAILED
+  POST_CREATE
+  POST_DELETE
+  POST_EDIT
+  THREAD_CREATE
+  THREAD_DELETE
+  THREAD_PIN
+  THREAD_CLOSE
+  THREAD_MOVE
+  USER_BAN
+  USER_UNBAN
+  USER_PROMOTE
+  MESSAGE_SEND
+  PROFILE_EDIT
+  REPORT_CREATE
+  REPORT_RESOLVE
+  CATEGORY_CREATE
+  FORUM_CREATE
+}
+
+enum PostStatus {
+  ACTIVE
+  DELETED
+  HIDDEN
+}
+
+enum ThreadStatus {
+  OPEN
+  CLOSED
+  PINNED
+  ARCHIVED
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  BANNED
+  SUSPENDED
+}
+
+model User {
+  id            String     @id @default(uuid())
+  username      String     @unique
+  email         String     @unique
+  passwordHash  String
+  role          Role       @default(USER)
+  status        UserStatus @default(PENDING)
+  age           Int?
+  country       String?
+  bio           String?
+  signature     String?
+  avatarUrl     String?
+  points        Int        @default(0)
+  rank          String     @default("Nouveau")
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  lastSeenAt    DateTime?
+  banExpiresAt  DateTime?
+
+  // Social connections
+  discordId     String?
+  googleId      String?
+  robloxId      String?
+  twitchId      String?
+  youtubeId     String?
+
+  // Relations
+  threads       Thread[]
+  posts         Post[]
+  sentMessages  PrivateMessage[] @relation("SentMessages")
+  receivedMessages PrivateMessage[] @relation("ReceivedMessages")
+  reactions     Reaction[]
+  polls         Poll[]
+  pollVotes     PollVote[]
+  reports       Report[]   @relation("ReportedBy")
+  reportedPosts Report[]   @relation("ReportedUser")
+  adminLogs     AdminLog[]
+  followers     Follow[]   @relation("Following")
+  following     Follow[]   @relation("Followers")
+  blockedUsers  Block[]    @relation("Blocker")
+  blockedBy     Block[]    @relation("Blocked")
+  badges        UserBadge[]
+  drafts        Draft[]
+  sessions      Session[]
+  chatMessages  ChatMessage[]
+  notifications Notification[]
+}
+
+model Session {
+  id          String   @id @default(uuid())
+  userId      String
+  token       String   @unique
+  fingerprint String?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+  expiresAt   DateTime
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([userId])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  slug        String   @unique
+  icon        String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  forums      Forum[]
+}
+
+model Forum {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  slug        String   @unique
+  order       Int      @default(0)
+  categoryId  String
+  parentId    String?
+  createdAt   DateTime @default(now())
+  category    Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  parent      Forum?   @relation("SubForums", fields: [parentId], references: [id])
+  subForums   Forum[]  @relation("SubForums")
+  threads     Thread[]
+}
+
+model Thread {
+  id          String       @id @default(uuid())
+  title       String
+  slug        String       @unique
+  status      ThreadStatus @default(OPEN)
+  forumId     String
+  authorId    String
+  isPinned    Boolean      @default(false)
+  isLocked    Boolean      @default(false)
+  views       Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  tags        Tag[]
+  forum       Forum        @relation(fields: [forumId], references: [id], onDelete: Cascade)
+  author      User         @relation(fields: [authorId], references: [id])
+  posts       Post[]
+  poll        Poll?
+  reports     Report[]
+}
+
+model Post {
+  id         String     @id @default(uuid())
+  content    String
+  status     PostStatus @default(ACTIVE)
+  threadId   String
+  authorId   String
+  parentId   String?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  editedAt   DateTime?
+  thread     Thread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author     User       @relation(fields: [authorId], references: [id])
+  parent     Post?      @relation("PostReplies", fields: [parentId], references: [id])
+  replies    Post[]     @relation("PostReplies")
+  reactions  Reaction[]
+  attachments Attachment[]
+  reports    Report[]
+  isBestAnswer Boolean  @default(false)
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  filename  String
+  url       String
+  size      Int
+  mimeType  String
+  postId    String
+  createdAt DateTime @default(now())
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Tag {
+  id      String   @id @default(uuid())
+  name    String   @unique
+  threads Thread[]
+}
+
+model Poll {
+  id          String     @id @default(uuid())
+  question    String
+  isAnonymous Boolean    @default(false)
+  endsAt      DateTime?
+  threadId    String     @unique
+  authorId    String
+  createdAt   DateTime   @default(now())
+  thread      Thread     @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  author      User       @relation(fields: [authorId], references: [id])
+  options     PollOption[]
+  votes       PollVote[]
+}
+
+model PollOption {
+  id     String     @id @default(uuid())
+  text   String
+  pollId String
+  poll   Poll       @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes  PollVote[]
+}
+
+model PollVote {
+  id       String     @id @default(uuid())
+  userId   String
+  pollId   String
+  optionId String
+  votedAt  DateTime   @default(now())
+  user     User       @relation(fields: [userId], references: [id])
+  poll     Poll       @relation(fields: [pollId], references: [id])
+  option   PollOption @relation(fields: [optionId], references: [id])
+
+  @@unique([userId, pollId])
+}
+
+model Reaction {
+  id        String   @id @default(uuid())
+  emoji     String
+  userId    String
+  postId    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId, emoji])
+}
+
+model PrivateMessage {
+  id         String   @id @default(uuid())
+  content    String
+  senderId   String
+  receiverId String
+  readAt     DateTime?
+  deletedBySender   Boolean @default(false)
+  deletedByReceiver Boolean @default(false)
+  createdAt  DateTime @default(now())
+  sender     User     @relation("SentMessages", fields: [senderId], references: [id])
+  receiver   User     @relation("ReceivedMessages", fields: [receiverId], references: [id])
+}
+
+model ChatMessage {
+  id        String   @id @default(uuid())
+  content   String
+  userId    String
+  room      String   @default("general")
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model Follow {
+  id          String   @id @default(uuid())
+  followerId  String
+  followingId String
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Followers", fields: [followerId], references: [id])
+  following   User     @relation("Following", fields: [followingId], references: [id])
+
+  @@unique([followerId, followingId])
+}
+
+model Block {
+  id        String   @id @default(uuid())
+  blockerId String
+  blockedId String
+  createdAt DateTime @default(now())
+  blocker   User     @relation("Blocker", fields: [blockerId], references: [id])
+  blocked   User     @relation("Blocked", fields: [blockedId], references: [id])
+
+  @@unique([blockerId, blockedId])
+}
+
+model Badge {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String
+  icon        String
+  color       String
+  users       UserBadge[]
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+}
+
+model Draft {
+  id        String   @id @default(uuid())
+  content   String
+  title     String?
+  userId    String
+  threadId  String?
+  forumId   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Ban {
+  id          String   @id @default(uuid())
+  type        BanType
+  value       String
+  reason      String?
+  permanent   Boolean  @default(false)
+  expiresAt   DateTime?
+  bannedById  String?
+  createdAt   DateTime @default(now())
+
+  @@index([value])
+}
+
+model LoginAttempt {
+  id          String   @id @default(uuid())
+  ipAddress   String
+  fingerprint String?
+  email       String?
+  success     Boolean
+  createdAt   DateTime @default(now())
+  userAgent   String?
+
+  @@index([ipAddress])
+  @@index([fingerprint])
+}
+
+model SystemLog {
+  id        String    @id @default(uuid())
+  userId    String?
+  action    LogAction
+  ipAddress String?
+  country   String?
+  userAgent String?
+  os        String?
+  browser   String?
+  page      String?
+  metadata  Json?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+model AdminLog {
+  id          String    @id @default(uuid())
+  adminId     String
+  action      LogAction
+  targetId    String?
+  targetType  String?
+  reason      String?
+  metadata    Json?
+  createdAt   DateTime  @default(now())
+  admin       User      @relation(fields: [adminId], references: [id])
+
+  @@index([adminId])
+}
+
+model Report {
+  id          String   @id @default(uuid())
+  reason      String
+  description String?
+  resolved    Boolean  @default(false)
+  reporterId  String
+  reportedId  String?
+  postId      String?
+  threadId    String?
+  createdAt   DateTime @default(now())
+  resolvedAt  DateTime?
+  reporter    User     @relation("ReportedBy", fields: [reporterId], references: [id])
+  reported    User?    @relation("ReportedUser", fields: [reportedId], references: [id])
+  post        Post?    @relation(fields: [postId], references: [id])
+  thread      Thread?  @relation(fields: [threadId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  link      String?
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}

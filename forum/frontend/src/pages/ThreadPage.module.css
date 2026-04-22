@@ -1,0 +1,212 @@
+.page { display: flex; flex-direction: column; gap: 16px; }
+
+.loading { display: flex; justify-content: center; padding: 80px; }
+
+.breadcrumb {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-2);
+  flex-wrap: wrap;
+}
+.breadcrumb a { color: var(--text-2); text-decoration: none; transition: color 0.15s; }
+.breadcrumb a:hover { color: var(--accent-h); }
+.breadcrumbCurrent { color: var(--text-0); }
+
+.threadHeader {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+
+.threadMeta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 2px 10px; border-radius: 100px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 11px; color: var(--text-2);
+}
+
+.threadTitle {
+  font-family: var(--font-display); font-size: 24px; font-weight: 700; color: var(--text-0); line-height: 1.3;
+}
+
+.threadInfo {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-2);
+}
+
+.authorLink { color: var(--accent-h); text-decoration: none; }
+.authorLink:hover { color: var(--accent); }
+
+.modActions { display: flex; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+
+/* Posts */
+.posts { display: flex; flex-direction: column; gap: 12px; }
+
+.post {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); overflow: hidden;
+  display: grid; grid-template-columns: 160px 1fr;
+  animation: fadeIn 0.2s var(--ease) both;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+
+.postBest { border-color: rgba(34,197,94,0.4); box-shadow: 0 0 0 1px rgba(34,197,94,0.1); }
+
+.bestAnswerBanner {
+  grid-column: 1 / -1;
+  padding: 8px 20px;
+  background: rgba(34,197,94,0.08);
+  border-bottom: 1px solid rgba(34,197,94,0.2);
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700; color: var(--green);
+}
+
+.postAuthor {
+  border-right: 1px solid var(--border);
+  padding: 20px 16px;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 6px; text-align: center;
+  background: var(--bg-2);
+}
+
+.avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-size: 20px; font-weight: 700; color: #fff;
+  overflow: hidden;
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+.authorName {
+  font-family: var(--font-display); font-size: 13px; font-weight: 700;
+  color: var(--text-0); text-decoration: none;
+}
+.authorName:hover { color: var(--accent-h); }
+
+.authorRank { font-family: var(--font-mono); font-size: 11px; }
+
+.authorStats {
+  display: flex; flex-direction: column; gap: 2px; margin-top: 4px;
+  font-family: var(--font-mono); font-size: 10px; color: var(--text-3);
+}
+
+.postBody { padding: 20px; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+
+.postTop { display: flex; align-items: center; justify-content: space-between; }
+
+.postDate { font-family: var(--font-mono); font-size: 12px; color: var(--text-2); }
+.edited { color: var(--text-3); font-size: 11px; }
+
+.postActions { display: flex; gap: 4px; }
+.actionBtn {
+  padding: 4px 8px; background: transparent; border: 1px solid transparent;
+  border-radius: var(--radius-sm); cursor: pointer; font-size: 13px;
+  transition: all 0.15s; opacity: 0;
+}
+.post:hover .actionBtn { opacity: 1; }
+.actionBtn:hover { background: var(--bg-3); border-color: var(--border); }
+
+.postContent {
+  font-family: var(--font-mono); font-size: 14px; color: var(--text-0);
+  line-height: 1.8; word-break: break-word;
+}
+
+.editArea { display: flex; flex-direction: column; gap: 10px; }
+.editInput {
+  width: 100%; padding: 12px; background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  color: var(--text-0); font-family: var(--font-mono); font-size: 14px;
+  resize: vertical; outline: none;
+}
+.editInput:focus { border-color: var(--accent); }
+.editBtns { display: flex; gap: 8px; }
+
+.attachments { display: flex; flex-wrap: wrap; gap: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
+.attachment {
+  padding: 4px 10px; background: var(--bg-3); border: 1px solid var(--border);
+  border-radius: var(--radius-sm); font-family: var(--font-mono); font-size: 12px;
+  color: var(--text-1); text-decoration: none; transition: all 0.15s;
+}
+.attachment:hover { border-color: var(--accent); color: var(--accent-h); }
+
+.signature {
+  padding-top: 10px; border-top: 1px dashed var(--border);
+  font-family: var(--font-mono); font-size: 12px; color: var(--text-3); font-style: italic;
+}
+
+/* Reactions */
+.reactions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.reactionBtns { display: flex; gap: 6px; flex-wrap: wrap; }
+.reactionBtn {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 100px;
+  background: var(--bg-3); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-1);
+  cursor: pointer; transition: all 0.15s;
+}
+.reactionBtn:hover, .reactionActive {
+  border-color: var(--accent); color: var(--accent-h); background: var(--accent-glow);
+}
+.addReaction {
+  display: flex; gap: 2px;
+  background: var(--bg-3); border: 1px solid var(--border); border-radius: 100px;
+  padding: 2px 6px; opacity: 0; transition: opacity 0.2s;
+}
+.post:hover .addReaction { opacity: 1; }
+.emojiPicker {
+  background: none; border: none; cursor: pointer; font-size: 14px;
+  padding: 2px 3px; border-radius: 4px; transition: transform 0.15s;
+}
+.emojiPicker:hover { transform: scale(1.3); }
+
+/* Typing */
+.typing { display: flex; align-items: center; gap: 8px; padding: 8px 0; }
+.typingDots { display: flex; gap: 3px; align-items: center; }
+.typingDots span { width: 6px; height: 6px; background: var(--text-2); border-radius: 50%; animation: dot 1.2s ease-in-out infinite; }
+.typingDots span:nth-child(2) { animation-delay: 0.2s; }
+.typingDots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot { 0%,60%,100% { transform:translateY(0); opacity:.4; } 30% { transform:translateY(-4px); opacity:1; } }
+.typing span:last-child { font-family: var(--font-mono); font-size: 12px; color: var(--text-2); font-style: italic; }
+
+/* Pagination */
+.pagination { display: flex; align-items: center; gap: 6px; }
+.pageBtn {
+  width: 32px; height: 32px; border-radius: var(--radius-md);
+  background: var(--bg-2); border: 1px solid var(--border);
+  font-family: var(--font-mono); font-size: 13px; color: var(--text-1);
+  cursor: pointer; transition: all 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pageBtn:hover { border-color: var(--border-h); color: var(--text-0); }
+.pageBtnActive { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* Reply */
+.replyBox {
+  background: var(--bg-1); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 24px;
+  display: flex; flex-direction: column; gap: 14px;
+}
+.replyTitle { font-family: var(--font-display); font-size: 18px; font-weight: 700; color: var(--text-0); }
+.lockedNote { font-family: var(--font-mono); font-size: 12px; color: var(--yellow); }
+
+.replyInput {
+  width: 100%; padding: 14px; background: var(--bg-2);
+  border: 1px solid var(--border); border-radius: var(--radius-md);
+  color: var(--text-0); font-family: var(--font-mono); font-size: 14px;
+  resize: vertical; outline: none; line-height: 1.7;
+  transition: border-color 0.2s;
+}
+.replyInput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+.replyInput::placeholder { color: var(--text-3); }
+
+.replyActions { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.charCount { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); }
+
+.lockedBanner {
+  background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.2);
+  border-radius: var(--radius-lg); padding: 20px;
+  text-align: center; font-family: var(--font-mono); font-size: 14px; color: #fca5a5;
+}
