@@ -25,7 +25,9 @@ export const logger = winston.createLogger({
     new winston.transports.Console({
       format: winston.format.combine(
         winston.format.colorize(),
-        winston.format.printf(({ timestamp, level, message, ...rest }: { timestamp: unknown; level: string; message: unknown; [key: string]: unknown }) => {
+        // Utilisation de (info: any) pour éviter les conflits de types TS2345
+        winston.format.printf((info: any) => {
+          const { timestamp, level, message, ...rest } = info;
           const extra = Object.keys(rest).length ? ` ${JSON.stringify(rest)}` : '';
           return `${timestamp} [${level}]: ${message}${extra}`;
         })
