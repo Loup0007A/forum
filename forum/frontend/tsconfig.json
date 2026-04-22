@@ -14,8 +14,9 @@
     "strict": true,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+    "types": ["vite/client"] // <--- Ajoute cette ligne
   },
-  "include": ["src"],
+  "include": ["src", "src/vite-env.d.ts"], // <--- Ajoute le fichier ici
   "references": [{ "path": "./tsconfig.node.json" }]
 }
