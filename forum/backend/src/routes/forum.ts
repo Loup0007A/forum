@@ -6,8 +6,14 @@ import { requireAdmin } from '../middleware/auth';
 // backend/src/routes/forum.ts
 export const forumRouter = Router();
 
-// On enlève toute ambiguïté sur les noms
-forumRouter.get('/categories', getCategories);
-forumRouter.post('/categories', requireAdmin, createCategory); // URL: /api/forum/categories
-forumRouter.post('/forums', requireAdmin, createForum);         // URL: /api/forum/forums
-forumRouter.get('/:slug', getForum);                            // URL: /api/forum/:slug
+// Route pour récupérer toutes les catégories
+forumRouter.get('/categories', getCategories); 
+
+// Route pour créer une catégorie
+forumRouter.post('/categories', requireAdmin, createCategory);
+
+// Route pour créer un forum (on change '/' par '/forums' pour être plus clair)
+forumRouter.post('/forums', requireAdmin, createForum);
+
+// Route pour voir un forum spécifique (doit être en dernier car c'est une variable :slug)
+forumRouter.get('/:slug', getForum);
