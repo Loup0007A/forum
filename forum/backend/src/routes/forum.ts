@@ -3,9 +3,11 @@ import { getCategories, getForum, createCategory, createForum } from '../control
 import { requireAdmin } from '../middleware/auth';
 
 // backend/src/routes/forum.ts
+// backend/src/routes/forum.ts
 export const forumRouter = Router();
 
-forumRouter.get('/categories', getCategories); // Plus explicite
-forumRouter.get('/:slug', getForum);
-forumRouter.post('/categories', requireAdmin, createCategory);
-forumRouter.post('/forums', requireAdmin, createForum); // On change '/' par '/forums'
+// On enlève toute ambiguïté sur les noms
+forumRouter.get('/categories', getCategories);
+forumRouter.post('/categories', requireAdmin, createCategory); // URL: /api/forum/categories
+forumRouter.post('/forums', requireAdmin, createForum);         // URL: /api/forum/forums
+forumRouter.get('/:slug', getForum);                            // URL: /api/forum/:slug
