@@ -410,21 +410,28 @@ function ForumManager() {
   const handleCreateCategory = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      // URL correcte : /forum/categories
       await api.post('/forum/categories', newCat);
       toast.success('Catégorie créée !');
       setNewCat({ name: '', slug: '', description: '', icon: '' });
       loadData();
-    } catch (err) { toast.error('Erreur lors de la création'); }
+    } catch (err: any) { 
+      toast.error(err.response?.data?.error || 'Erreur création catégorie'); 
+    }
   };
-
+  
   const handleCreateForum = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await api.post('/forum/forums', newForum);
+      // ATTENTION : Ta route backend pour créer un forum est '/' et non '/forums'
+      // On appelle donc juste '/forum'
+      await api.post('/forum', newForum); 
       toast.success('Forum ajouté !');
       setNewForum({ name: '', slug: '', description: '', categoryId: '' });
       loadData();
-    } catch (err) { toast.error('Erreur lors de la création'); }
+    } catch (err: any) { 
+      toast.error(err.response?.data?.error || 'Erreur création forum'); 
+    }
   };
 
   return (
