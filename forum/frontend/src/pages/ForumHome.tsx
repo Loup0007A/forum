@@ -23,7 +23,7 @@ export default function ForumHome() {
   const [stats, setStats] = useState({ users: 0, posts: 0, threads: 0, online: 0 });
 
   useEffect(() => {
-    api.get('/forums').then(r => { setCategories(r.data); setLoading(false); });
+    api.get('/forum').then(r => { setCategories(r.data); setLoading(false); });
   }, []);
 
   if (loading) return (
