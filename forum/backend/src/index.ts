@@ -57,7 +57,7 @@ app.use(logRequest);
 app.use('/api', requireJs);
 
 app.use('/api/auth', authRouter);
-app.use('/api/forums', requireAuth, forumRouter);
+app.use('/api/forum', requireAuth, forumRouter);
 app.use('/api/threads', requireAuth, threadRouter);
 app.use('/api/posts', requireAuth, postRouter);
 app.use('/api/users', requireAuth, userRouter);
