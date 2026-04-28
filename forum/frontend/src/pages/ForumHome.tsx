@@ -23,7 +23,17 @@ export default function ForumHome() {
   const [stats, setStats] = useState({ users: 0, posts: 0, threads: 0, online: 0 });
 
   useEffect(() => {
-    api.get('/forum').then(r => { setCategories(r.data); setLoading(false); });
+    // On récupère les catégories qui, côté backend, 
+    // doivent inclure (Prisma 'include') leurs forums associés.
+    api.get('/forum/categories')
+      .then(r => {
+        setCategories(r.data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Erreur lors de la récupération :", err);
+        setLoading(false);
+      });
   }, []);
 
   if (loading) return (
