@@ -15,7 +15,7 @@ export default function ForumPage() {
   const { user } = useAuthStore();
 
   useEffect(() => {
-    api.get(`/forums/${slug}?page=${page}`)
+    api.get(`/forum/${slug}?page=${page}`)
       .then(r => { setData(r.data); setLoading(false); })
       .catch(() => navigate('/forum'));
   }, [slug, page]);
